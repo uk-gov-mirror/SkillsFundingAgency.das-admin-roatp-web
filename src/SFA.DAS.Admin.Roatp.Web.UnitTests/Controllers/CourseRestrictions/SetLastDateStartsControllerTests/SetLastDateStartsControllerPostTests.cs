@@ -219,7 +219,7 @@ public class SetLastDateStartsControllerPostTests
     }
 
     [Test]
-    public async Task WhenApiReturnsNotFound_ThenReturnsNotFound()
+    public async Task WhenApiReturnsNotFound_ThenThrows()
     {
         var outerApiClientMock = new Mock<IOuterApiClient>();
         var sessionServiceMock = new Mock<ISessionService>();
@@ -239,13 +239,13 @@ public class SetLastDateStartsControllerPostTests
         sut.SetupAuthenticatedUser();
         sut.AddTempData();
 
-        var result = await sut.Index(
+        var act = () => sut.Index(
             LarsCode,
             Ukprn,
             new SetLastDateStartsSubmitModel { Day = "15", Month = "03", Year = "2027" },
             new CancellationToken());
 
-        result.Should().BeOfType<NotFoundResult>();
+        await act.Should().ThrowAsync<ApiException>();
         sessionServiceMock.Verify(s => s.Delete(SessionKeys.SetLastDateStarts), Times.Never);
     }
 
@@ -345,7 +345,6 @@ public class SetLastDateStartsControllerPostTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(OuterApiResponse.Create<object>(
                 statusCode,
-                method: HttpMethod.Patch,
-                includeException: statusCode != HttpStatusCode.NotFound));
+                method: HttpMethod.Patch));
     }
 }

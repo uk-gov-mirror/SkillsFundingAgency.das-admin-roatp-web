@@ -272,7 +272,7 @@ public class AddAllowedCourseLastStartDateControllerPostTests
     }
 
     [Test, MoqAutoData]
-    public async Task WhenPostingAddLastStartDate_AndPatchReturnsNotFound_ThenReturnsNotFound(
+    public async Task WhenPostingAddLastStartDate_AndPatchReturnsNotFound_ThenThrows(
         [Frozen] Mock<IOuterApiClient> outerApiClientMock,
         [Frozen] Mock<ICoursesService> coursesServiceMock,
         [Frozen] Mock<IValidator<SetLastDateStartsSubmitModel>> validatorMock,
@@ -285,14 +285,14 @@ public class AddAllowedCourseLastStartDateControllerPostTests
             .ReturnsAsync(new ValidationResult());
         sut.SetupAuthenticatedUser();
 
-        var result = await sut.Index(
+        var act = () => sut.Index(
             Ukprn,
             RouteLearningType.Apprenticeship,
             LarsCode,
             new SetLastDateStartsSubmitModel { Day = "12", Month = "07", Year = "2027" },
             new CancellationToken());
 
-        result.Should().BeOfType<NotFoundResult>();
+        await act.Should().ThrowAsync<ApiException>();
     }
 
     [Test, MoqAutoData]
@@ -353,7 +353,6 @@ public class AddAllowedCourseLastStartDateControllerPostTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(OuterApiResponse.Create<object>(
                 statusCode,
-                method: HttpMethod.Patch,
-                includeException: statusCode != HttpStatusCode.NotFound));
+                method: HttpMethod.Patch));
     }
 }

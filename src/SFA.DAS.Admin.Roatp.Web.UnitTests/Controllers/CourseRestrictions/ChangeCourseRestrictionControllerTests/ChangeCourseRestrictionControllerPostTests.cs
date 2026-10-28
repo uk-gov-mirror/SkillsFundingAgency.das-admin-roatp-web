@@ -146,7 +146,7 @@ public class ChangeCourseRestrictionControllerPostTests
     }
 
     [Test]
-    public async Task WhenRemoveSelected_AndApiReturnsNotFound_ThenReturnsNotFound()
+    public async Task WhenRemoveSelected_AndApiReturnsNotFound_ThenThrows()
     {
         var outerApiClientMock = new Mock<IOuterApiClient>();
         var validatorMock = new Mock<IValidator<ChangeCourseRestrictionSubmitModel>>();
@@ -173,13 +173,13 @@ public class ChangeCourseRestrictionControllerPostTests
         sut.SetupAuthenticatedUser();
         sut.AddTempData();
 
-        var result = await sut.Index(
+        var act = () => sut.Index(
             LarsCode,
             Ukprn,
             new ChangeCourseRestrictionSubmitModel { SelectedOption = ChangeCourseRestrictionOptions.Remove },
             new CancellationToken());
 
-        result.Should().BeOfType<NotFoundResult>();
+        await act.Should().ThrowAsync<ApiException>();
     }
 
     [TestCase(HttpStatusCode.BadRequest)]
@@ -297,7 +297,6 @@ public class ChangeCourseRestrictionControllerPostTests
                 It.IsAny<CancellationToken>()))
             .ReturnsAsync(OuterApiResponse.Create<object>(
                 statusCode,
-                method: HttpMethod.Patch,
-                includeException: statusCode != HttpStatusCode.NotFound));
+                method: HttpMethod.Patch));
     }
 }

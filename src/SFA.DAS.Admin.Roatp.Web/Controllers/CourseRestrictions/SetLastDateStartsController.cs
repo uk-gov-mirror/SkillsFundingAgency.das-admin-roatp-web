@@ -1,4 +1,3 @@
-using System.Net;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -89,11 +88,6 @@ public class SetLastDateStartsController(
              User.UserDisplayName(),
              new PatchProviderAllowedCourseRequest { LastDateStarts = lastDateStarts },
              cancellationToken);
-
-        if (response.StatusCode == HttpStatusCode.NotFound)
-        {
-            return NotFound();
-        }
 
         await response.EnsureSuccessStatusCodeAsync();
 

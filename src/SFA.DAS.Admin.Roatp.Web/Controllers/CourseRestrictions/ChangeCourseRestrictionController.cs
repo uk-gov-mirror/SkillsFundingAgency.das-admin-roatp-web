@@ -1,4 +1,3 @@
-using System.Net;
 using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -59,11 +58,6 @@ public class ChangeCourseRestrictionController(
             User.UserDisplayName(),
             new PatchProviderAllowedCourseRequest { LastDateStarts = null },
             cancellationToken);
-
-        if (response.StatusCode == HttpStatusCode.NotFound)
-        {
-            return NotFound();
-        }
 
         await response.EnsureSuccessStatusCodeAsync();
 
